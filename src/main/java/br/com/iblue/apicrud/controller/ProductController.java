@@ -26,18 +26,22 @@ public class ProductController {
 	@Autowired
 	private IProductRepository dao;
 
-	@PostMapping("/gravar")
-	public ResponseEntity<?> create(@RequestBody Product product) {
+	@PostMapping("/post")
+	public ResponseEntity<?> insert(@RequestBody Product product) {
 		try {
 			Product p = dao.save(product);
 
 			Map<String, Object> map = new HashMap<String, Object>() {
 				{
-					put("product-saved", p);
-					put("status", "saved successfully");
+					if (p == null) {
+						throw new Exception("Falha ao Inserir os Dadoas");
+					}else {
+						put("product-saved", p);
+						put("status", "saved successfully");
+					}
 				}
 			};
-			return ResponseEntity.status(200).body(map);
+			return ResponseEntity.status(200).body(p);
 		} catch (Exception ex) {
 			Map<String, Object> error = new HashMap<String, Object>() {
 				{
@@ -51,6 +55,21 @@ public class ProductController {
 	@GetMapping("/products")
 	public ResponseEntity<List<Product>> findAll() {
 		return ResponseEntity.status(200).body(dao.findAll());
+	}
+	
+	@GetMapping("/products/{idProduct}")
+	public ResponseEntity<?> findById(@PathVariable("idProduct") Long idProduct){
+		try{ 
+		Product product = dao.findById(idProduct).get();
+		 if (product == null) {
+			  throw new IllegalAccessException("Produto não Encontrado");
+		 }
+		 return ResponseEntity.status(200).body(product);
+		}catch(Exception ex) {
+			 Map<String,Object> mapa = new HashMap<String,Object>();
+			 mapa.put("Produto não Encontrado", ex.getMessage());
+			 return ResponseEntity.status(404).body(mapa);
+			}
 	}
 	
 	@DeleteMapping("/delete/{idProduct}")
