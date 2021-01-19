@@ -6,7 +6,9 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -49,5 +51,19 @@ public class ProductController {
 	@GetMapping("/products")
 	public ResponseEntity<List<Product>> findAll() {
 		return ResponseEntity.status(200).body(dao.findAll());
+	}
+	
+	@DeleteMapping("/delete/{idProduct}")
+	public ResponseEntity<?> delete(@PathVariable("idProduct") Long idProduct) {
+		try {
+			dao.deleteById(idProduct);
+			Map<String, Object> mapa = new HashMap<String, Object>();
+			mapa.put("Excluido", "Excluido com Sucesso");
+			return ResponseEntity.status(200).body(mapa);
+		} catch (Exception ex) {
+			Map<String, Object> mapa = new HashMap<String, Object>();
+			mapa.put("Error", ex.getMessage());
+			return ResponseEntity.status(400).body(mapa);
+		}
 	}
 }
