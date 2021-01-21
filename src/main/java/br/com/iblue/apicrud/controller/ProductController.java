@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -83,6 +84,25 @@ public class ProductController {
 			Map<String, Object> mapa = new HashMap<String, Object>();
 			mapa.put("Error", ex.getMessage());
 			return ResponseEntity.status(400).body(mapa);
+		}
+	}
+	
+	@PutMapping("/update/{idProduct}")
+	public ResponseEntity<?> update(@PathVariable("idProduct") Long idProduct, @RequestBody Product product) {
+		try {
+			Product p = dao.findById(idProduct).get();
+			if (p == null) {
+				throw new IllegalAccessException("Produto Não Encontrado");
+			}
+			p.setNameProduct(product.getNameProduct());
+			p.setPrice(product.getPrice());
+			p.setQuantity(product.getQuantity());
+			Product update = dao.save(p);
+			return ResponseEntity.status(200).body(update);
+		} catch (Exception ex) {
+			Map<String, Object> mapa = new HashMap<String, Object>();
+			mapa.put("Erro de Gravação", ex.getMessage());
+			return ResponseEntity.status(500).body(mapa);
 		}
 	}
 }
